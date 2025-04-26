@@ -36,19 +36,16 @@ class CctvModel(QObject):
         self.filtered_data: List[Dict] = []
         self.layer_name = "QcctvKor_temp_layer"
         
-        # API 설정 로드
+        # API 설정 로드 (초기화 시에는 오류 발생하지 않음)
         try:
             config_manager = ConfigManager()
             self.api_key = config_manager.get_api_key()
-            
-            if not self.api_key:
-                raise ConfigError("API 키가 설정되지 않았습니다. 설정 메뉴에서 API 키를 입력해주세요.")
-                
             self.base_url = "http://openapi.its.go.kr:8081/api/NCCTVInfo"
             logger.info("API 설정이 로드되었습니다.")
         except Exception as e:
             logger.error(Logger.format_error(e, "API 설정 로드 실패"))
-            raise handle_exception(e)
+            self.api_key = ""
+            self.base_url = "http://openapi.its.go.kr:8081/api/NCCTVInfo"
             
         self._cache = {}
         self._cache_timeout = 300
@@ -57,6 +54,10 @@ class CctvModel(QObject):
     
     def load_cctv_data(self) -> None:
         """비동기적으로 CCTV 데이터 로드"""
+        # API 키 검사는 여기서 수행
+        if not self.api_key:
+            raise ConfigError("API 키가 설정되지 않았습니다. '플러그인 > QcctvKor > ITS API 키 설정' 메뉴에서 API 키를 설정해주세요.")
+        
         Thread(target=self._async_load_data, daemon=True).start()
         
     @Logger.log_function_call

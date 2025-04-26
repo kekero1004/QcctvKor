@@ -20,7 +20,7 @@ from ..model.filter_recommend import FilterRecommend
 from ..model.cctv_model import CctvModel
 
 class CctvDialog(QDialog):
-    def __init__(self, iface, cctv_info=None, parent=None):
+    def __init__(self, cctv_info=None, parent=None, iface=None):
         super().__init__(parent)
         self.iface = iface
         # CCTV 정보가 없으면 기본값 설정

@@ -1,12 +1,13 @@
 from qgis.gui import QgisInterface, QgsMapToolIdentifyFeature
 from qgis.core import QgsProject, Qgis
-from qgis.PyQt.QtWidgets import QAction, QMessageBox, QDialog
+from qgis.PyQt.QtWidgets import QAction, QMessageBox, QDialog, QToolButton, QMenu
 from qgis.PyQt.QtGui import QIcon
 from ..model.cctv_model import CctvModel
 from ..view.cctv_dialog import CctvDialog
 from ..view.settings_dialog import SettingsDialog
-import os
+from ..view.api_key_dialog import ApiKeyDialog
 from ..utils.config_manager import ConfigManager
+import os
 
 class CctvController:
     def __init__(self, iface: QgisInterface):
@@ -14,10 +15,11 @@ class CctvController:
         self.model = CctvModel()
         self.dialog = None
         self.action = None
+        self.api_key_action = None
         self.map_tool = None
         
-    def initialize_plugin(self) -> None:
-        """Initialize plugin components"""
+    def initGui(self) -> None:
+        """Initialize plugin components - QGIS Plugin required method"""
         # Create plugin menu item
         icon_path = os.path.join(os.path.dirname(__file__), "..", "resources", "icon.png")
         self.action = QAction(
@@ -27,34 +29,52 @@ class CctvController:
         )
         self.action.triggered.connect(self.show_cctv_layer)
         
-        # Add menu items to QGIS
+        # API 키 설정 메뉴 아이템
+        self.api_key_action = QAction(
+            QIcon(icon_path),
+            "ITS API 키 설정",
+            self.iface.mainWindow()
+        )
+        self.api_key_action.triggered.connect(self.show_api_key_dialog)
+        
+        # 메뉴에 아이템 추가
         self.iface.addPluginToMenu("QcctvKor", self.action)
+        self.iface.addPluginToMenu("QcctvKor", self.api_key_action)
         self.iface.addToolBarIcon(self.action)
+        
+    def show_api_key_dialog(self) -> None:
+        """API 키 설정 대화상자 표시"""
+        dialog = ApiKeyDialog(self.iface.mainWindow())
+        dialog.exec_()
         
     def show_cctv_layer(self) -> None:
         """Show CCTV points on map"""
+        # API 키 확인
+        config_manager = ConfigManager()
+        has_api_key = bool(config_manager.get_api_key())
+        
+        # 기본 CCTV 정보 (API 키가 없는 경우 사용)
+        default_cctv_info = {
+            'name': 'CCTV 뷰어',
+            'url': '',  # 비어있는 URL
+            'lat': 37.5665,  # 서울 중심 좌표
+            'lon': 126.9780
+        }
+        
         try:
-            # API 키 확인 및 설정 대화상자 표시
-            config_manager = ConfigManager()
-            
-            if not config_manager.get_api_key():
-                QMessageBox.information(
+            if not has_api_key:
+                # API 키가 없는 경우 경고 메시지 표시 후 기본 대화상자 열기
+                QMessageBox.warning(
                     self.iface.mainWindow(),
                     "API 키 필요",
-                    "CCTV 데이터를 불러오기 위해 ITS API 키를 입력해 주세요."
+                    "ITS API 키가 입력되지 않아 CCTV 레이어를 불러오는 데 실패했습니다.\n'플러그인 > QcctvKor > ITS API 키 설정' 메뉴에서 API 키를 설정해주세요."
                 )
-                dialog = SettingsDialog(self.iface.mainWindow())
-                result = dialog.exec_()
                 
-                # 사용자가 취소한 경우 종료
-                if result != QDialog.Accepted:
-                    return
-                
-                # API 키가 여전히 설정되지 않은 경우 종료
-                if not config_manager.get_api_key():
-                    return
+                # 기본 CCTV 대화상자 표시
+                self.show_cctv_dialog(default_cctv_info)
+                return
             
-            # Load CCTV data
+            # API 키가 있는 경우 정상적으로 CCTV 데이터 로드
             self.model.load_cctv_data()
             
             # Create temporary layer
@@ -75,11 +95,15 @@ class CctvController:
             self.iface.mapCanvas().setMapTool(self.map_tool)
             
         except Exception as e:
+            # 오류 발생 시 오류 메시지 표시 후 기본 대화상자 열기
             QMessageBox.critical(
                 self.iface.mainWindow(),
-                "Error",
-                f"Failed to load CCTV layer: {str(e)}"
+                "오류",
+                f"CCTV 레이어를 불러오는 데 실패했습니다: {str(e)}"
             )
+            
+            # 기본 CCTV 대화상자 표시
+            self.show_cctv_dialog(default_cctv_info)
         
     def handle_feature_click(self, feature) -> None:
         """Handle CCTV point click event"""
@@ -102,7 +126,7 @@ class CctvController:
         if self.dialog:
             self.dialog.close()
             
-        self.dialog = CctvDialog(cctv_info, self.iface.mainWindow())
+        self.dialog = CctvDialog(cctv_info, self.iface.mainWindow(), self.iface)
         self.dialog.finished.connect(self.cleanup)
         self.dialog.show()
         
@@ -121,6 +145,7 @@ class CctvController:
         """Unload plugin"""
         # Remove the plugin menu item and icon
         self.iface.removePluginMenu("QcctvKor", self.action)
+        self.iface.removePluginMenu("QcctvKor", self.api_key_action)
         self.iface.removeToolBarIcon(self.action)
         
         # Clean up resources
