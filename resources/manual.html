@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>QcctvKor 사용자 매뉴얼</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        .note {
+            background-color: #f0f0f0;
+            padding: 10px;
+            border-left: 4px solid #666;
+            margin: 10px 0;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>QcctvKor 사용자 매뉴얼</h1>
+    
+    <h2>1. 소개</h2>
+    <p>
+        QcctvKor는 QGIS에서 대한민국의 교통 CCTV를 실시간으로 모니터링할 수 있는 플러그인입니다.
+        ITS 국가교통정보센터의 API를 활용하여 전국의 주요 도로 CCTV 영상을 제공합니다.
+    </p>
+    
+    <h2>2. 설치 및 설정</h2>
+    <ol>
+        <li>QGIS 플러그인 관리자에서 "QcctvKor" 검색</li>
+        <li>플러그인 설치</li>
+        <li>ITS API 키 설정:
+            <ul>
+                <li>플러그인 메뉴 → 설정</li>
+                <li>발급받은 API 키 입력</li>
+                <li>API 키는 <a href="http://openapi.its.go.kr">ITS 오픈 API</a>에서 발급 가능</li>
+            </ul>
+        </li>
+    </ol>
+    
+    <h2>3. 주요 기능</h2>
+    <h3>3.1 CCTV 표시</h3>
+    <ul>
+        <li>플러그인 메뉴 클릭 시 CCTV 위치가 지도에 표시됨</li>
+        <li>각 CCTV 포인트에는 설치 위치명이 라벨로 표시됨</li>
+    </ul>
+    
+    <h3>3.2 필터링</h3>
+    <ul>
+        <li>지역별 필터링 (서울, 경기, 인천, 부산 등)</li>
+        <li>도로 유형별 필터링 (고속도로, 국도, 시도)</li>
+        <li>CCTV 이름으로 검색 가능</li>
+    </ul>
+    
+    <h3>3.3 영상 보기</h3>
+    <ul>
+        <li>CCTV 포인트 클릭 시 실시간 영상 팝업</li>
+        <li>현재 시간 표시</li>
+        <li>영상 캡처 기능</li>
+    </ul>
+    
+    <h3>3.4 데이터 저장</h3>
+    <ul>
+        <li>필터링된 결과를 CSV 파일로 저장</li>
+        <li>shapefile 형식으로 내보내기</li>
+        <li>CCTV 데이터 보고서 생성</li>
+    </ul>
+    
+    <h2>4. 문제 해결</h2>
+    <div class="note">
+        <h3>자주 발생하는 문제:</h3>
+        <ul>
+            <li>영상이 표시되지 않는 경우:
+                <ul>
+                    <li>네트워크 연결 확인</li>
+                    <li>API 키 유효성 확인</li>
+                    <li>CCTV 정비/점검 여부 확인</li>
+                </ul>
+            </li>
+            <li>필터링이 작동하지 않는 경우:
+                <ul>
+                    <li>검색어 철자 확인</li>
+                    <li>플러그인 재시작 시도</li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+    
+    <h2>5. 기술 지원</h2>
+    <p>
+        문제가 발생하거나 기능 개선 요청이 있는 경우, 아래 채널을 통해 문의해주세요:
+    </p>
+    <ul>
+        <li>이슈 트래커: <a href="http://github.com/your-repo/issues">GitHub Issues</a></li>
+        <li>이메일: developer@example.com</li>
+    </ul>
+</body>
+</html> 

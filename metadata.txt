@@ -1,0 +1,20 @@
+[general]
+name=QcctvKor
+qgisMinimumVersion=3.36
+description=Korean Traffic CCTV Viewer
+version=1.0
+author=QGIS Developer
+email=developer@example.com
+
+about=This plugin provides real-time traffic CCTV streaming service for Korean roads
+tracker=http://github.com/your-repo/issues
+repository=http://github.com/your-repo
+
+tags=cctv,korea,traffic,streaming
+
+homepage=http://github.com/your-repo
+category=Web
+icon=resources/icon.png
+
+experimental=False
+deprecated=False 
